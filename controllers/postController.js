@@ -8,7 +8,7 @@ const addPosts = async (req,res) => {
     // publish messages to the input queue
     await publishMessage(queueName, payload)
     // to see publishedMessage
-    // await receiveMessage(queueName)
+    await receiveMessage(queueName)
 
     res.status(200).send({message : 'Success'})
     }
