@@ -9,25 +9,45 @@ module.exports = class MQ {
         this.queue = queue;
     }
 
-    async setupConnection() {
+    async connect () {
+
         this.conn = await amqp.connect(this.uri);
         this.channel = await this.conn.createChannel();
 
         await this.channel.assertQueue(this.queue, { durable: false });
     }
 
-    publish(queueName, msg) {
+    async publish(queueName, msg) {
+        if (!this.conn) {
+            await this.connect()
+        }
         this.channel.sendToQueue(queueName, Buffer.from(msg));
         console.log('message sent', msg);
     }
 
-    async subscribe(queueName) {
+    async disconnect() {
+        if (!this.channel) return;
+        await this.channel.close();
+        this.channel = null;
+    }
+
+
+    async consume(queueName) {
+        if (!this.conn) {
+            await this.connect()
+        }
         await this.channel.consume(queueName,
             (msg) => {
                 const result = msg.content.toString();
                 console.log(`Received msg ${result}`);
+                this.acknowledge(msg)
             }
         )
 
     };
+
+    async acknowledge(msg) {
+        this.channel.ack(msg);
+
+    }
 }
