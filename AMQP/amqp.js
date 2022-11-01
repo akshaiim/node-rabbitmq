@@ -47,7 +47,7 @@ module.exports = class MQ {
                 // console.log(content, properties)
                 console.log(`Received msg ${result}`);
                 this.publish(msg.properties.replyTo,
-                  Buffer.from(msg.content.toString() + 'Mishra'), {
+                  Buffer.from(msg.content.toString() + ' this is example response'), {
                     correlationId: msg.properties.correlationId
                   });
                 // return {content, properties};
