@@ -1,5 +1,12 @@
 const MQ = require("./amqp");
 
+
+/**
+ * Represents an abstract class for using different messahing service.
+ * @constructor
+ * @param {string} type - The type of messaging service eg: 'RabbitMq','redis' etc.
+ * @param {string} queue - The queue name where the data needs to be published/consumed.
+ */
 module.exports = class MessagingStore {
     constructor(type, queueName) {
         this.MessagingService = ''
@@ -9,17 +16,17 @@ module.exports = class MessagingStore {
     }
 
     async connect () {
-        await this.MessagingService.connect();
+        this.MessagingService.connect();
 
     }
     async disconnect (){
         this.MessagingService.disconnect()
     }
-    publish(queue, msg) {
-        this.MessagingService.publish(queue, msg)
+    publish(queue, msg, prop) {
+        this.MessagingService.publish(queue, msg, prop)
 
     }
-    consume(queue) {
+    async consume(queue) {
         this.MessagingService.consume(queue)
     }
     acknowledge() {

@@ -5,8 +5,8 @@ const MessagingStore = require('./messagingService');
 const receiveMessage = async (queueName) => {
   let msgq = new MessagingStore('RabbitMq',queueName);
   await msgq.connect()
-  await msgq.consume(queueName)
+  await msgq.consume(queueName)   
 }
 // receiveMessage()
 
-module.exports = receiveMessage
+module.exports = receiveMessage 

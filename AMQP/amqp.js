@@ -17,11 +17,12 @@ module.exports = class MQ {
         await this.channel.assertQueue(this.queue, { durable: false });
     }
 
-    async publish(queueName, msg) {
+    async publish(queueName, msg, prop) {
         if (!this.conn) {
             await this.connect()
         }
-        this.channel.sendToQueue(queueName, Buffer.from(msg));
+        this.channel.assertQueue(queueName,{durable:false})
+        this.channel.sendToQueue(queueName, Buffer.from(msg), prop);
         console.log('message sent', msg);
     }
 
@@ -36,15 +37,23 @@ module.exports = class MQ {
         if (!this.conn) {
             await this.connect()
         }
-        await this.channel.consume(queueName,
+        this.channel.prefetch(1)
+        const data = await this.channel.consume(queueName,
             (msg) => {
+                console.log(msg.content.toString())
+                if(msg.properties.replyTo){
+                // const {content, properties} = msg;
                 const result = msg.content.toString();
+                // console.log(content, properties)
                 console.log(`Received msg ${result}`);
-                this.acknowledge(msg)
-            }
+                this.publish(msg.properties.replyTo,
+                  Buffer.from(msg.content.toString() + 'Mishra'), {
+                    correlationId: msg.properties.correlationId
+                  });
+                // return {content, properties};
+            }},{noAck: true}
         )
-
-    };
+}
 
     async acknowledge(msg) {
         this.channel.ack(msg);
