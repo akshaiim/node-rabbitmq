@@ -26,8 +26,8 @@ module.exports = class MessagingStore {
         this.MessagingService.publish(queue, msg, prop)
 
     }
-    async consume(queue) {
-        this.MessagingService.consume(queue)
+    async consume(queue, correlationId) {
+        this.MessagingService.consume(queue, correlationId)
     }
     acknowledge() {
         this.MessagingService.acknowledge()

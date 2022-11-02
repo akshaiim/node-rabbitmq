@@ -10,7 +10,7 @@ const publishMessage = async (queueName, payload) => {
     await msgq.connect()
     await msgq.publish(queueName, payload,  { correlationId, replyTo: 'postresponse' });
     await receiveMessage(queueName) 
-    await msgq.consume('postresponse')
+    await msgq.consume('postresponse', correlationId)
 }
 
 module.exports = publishMessage

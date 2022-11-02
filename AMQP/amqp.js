@@ -1,6 +1,12 @@
 const amqp = require('amqplib');
 require('dotenv').config();
 
+/**
+ * Represents rabbitmq class for publishing and consuming messages via rpc.
+ * @constructor
+ * @param {string} queue - The queue name where the data needs to be published/consumed.
+ */
+
 module.exports = class MQ {
     constructor(queue) {
         this.conn;
@@ -33,14 +39,19 @@ module.exports = class MQ {
     }
 
 
-    async consume(queueName) {
+    async consume(queueName, correlationId) {
         if (!this.conn) {
             await this.connect()
         }
         this.channel.prefetch(1)
         const data = await this.channel.consume(queueName,
             (msg) => {
-                console.log(msg.content.toString())
+                if(correlationId && correlationId == msg.properties.correlationId){
+                    console.log(correlationId, msg.properties.correlationId);
+                    console.log(msg.content.toString())
+
+                }
+                // console.log(msg.content.toString())
                 if(msg.properties.replyTo){
                 // const {content, properties} = msg;
                 const result = msg.content.toString();
